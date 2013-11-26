@@ -2,6 +2,9 @@
 # Change Log
 #=====================================================================
 #
+# version 3.1_alpha1 - (2013-11-25)
+#     - Formatting cleanup
+#     - Split Notice and Error definitions into separate files.
 # version 3.0_rc4 - (2011-11-24)
 #     - Removing mkfifo commands, thereby improving portability.
 #     - Fixing not working table exclude feature for wildcards.
@@ -17,7 +20,7 @@
 #       methods available.
 #     - Fixed some bugs.
 # version 3.0_beta2 - (2011-08-21)
-#     - Added possibility to backup local files. 
+#     - Added possibility to backup local files.
 #     - Added full schema backup.
 #     - Added master-data option.
 #     - Fixed some bugs.
