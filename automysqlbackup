@@ -50,7 +50,8 @@ source flags.sh
 #let "N_latest_cleanup_failed=0x10"
 #let "N_backup_local_nofiles=0x20"
 source errors.sh
-source notices.sh ## END _errors_notifications
+source notices.sh
+## END _errors_notifications
 
 # BEGIN _functions
 
@@ -97,6 +98,25 @@ load_default_config() {
     CONFIG_mail_address='root'
     CONFIG_encrypt='no'
     CONFIG_encrypt_password='password0123'
+}
+
+# @info:        Executes a command remotely via SSH
+# @args:        Full command to be run.  Be sure to properly escape the command first.
+# @return:      (none)
+remote_cmd () {
+    if (( $CONFIG_dryrun )); then
+        echo "Command to be run remotely on $CONFIG_mysql_dump_host via SSH:"
+        ssh "${CONFIG_ssh_opts[@]}" -i "$CONFIG_ssh_keyfile" ${CONFIG_ssh_username}@${CONFIG_mysql_dump_host} <<DATA
+set -o pipefail
+echo eval '$@'
+DATA
+    echo
+    else
+        ssh "${CONFIG_ssh_opts[@]}" -i "$CONFIG_ssh_keyfile" ${CONFIG_ssh_username}@${CONFIG_mysql_dump_host} <<DATA
+set -o pipefail
+echo eval '$@'
+DATA
+    fi
 }
 
 # @return:	true, if variable is set; else false
@@ -643,7 +663,7 @@ process_dbs() {
     manifest_file="${CONFIG_backup_dir}/${subfolder}${subsubfolder}/Manifest"
     fname="${CONFIG_backup_dir}/${subfolder}${subsubfolder}/${prefix}${name}_${datetimestamp}${midfix}${extension}"
 
-    (( $CONFIG_debug )) && echo "DEBUG: process_dbs >> Setting manifest file to: ${manifest_file}" 
+    (( $CONFIG_debug )) && echo "DEBUG: process_dbs >> Setting manifest file to: ${manifest_file}"
 
     if (( $multipledbs )); then
         # multiple databases
@@ -882,7 +902,7 @@ directory_checks_enable_logging () {
         printf 'backup folder %s ... ' "${CONFIG_backup_dir}"
 
         if [[ -d "${CONFIG_backup_dir}" ]]; then
-            printf 'exists ... writable? ' 
+            printf 'exists ... writable? '
             if (( $CONFIG_dryrun )); then
                 printf 'dry-running. Skipping. Logging to /tmp\n'
                 #log_file="/tmp/${CONFIG_mysql_dump_host}-`date +%N`.log"
@@ -1377,7 +1397,7 @@ get_latest_manifest_entry_for_db() {
 }
 
 # @params:	manifest_file	filename/md5sum/id/rel_id	[1(=don't parse manifest after finished)]
-# if second parameters 
+# if second parameters
 #
 #	lock manifest -> use awk, print all lines that don't have second parameter at the appropriate field -> unlock manifest
 #	param3=0 -> parse manifest
@@ -1672,7 +1692,7 @@ method_backup () {
 
     export LC_ALL=C                         # Set input/output to default system language and sort bytewise
     PROGNAME=`basename $0`
-    PATH=${PATH}:/usr/local/bin:/usr/bin:/bin:/usr/local/mysql/bin 
+    PATH=${PATH}:/usr/local/bin:/usr/bin:/bin:/usr/local/mysql/bin
     version=3.0
     fields=5 # manifest fields
 
@@ -1718,7 +1738,7 @@ method_backup () {
     echo "======================================================================"
     echo "AutoMySQLBackup version ${version}"
     echo "http://sourceforge.net/projects/automysqlbackup/"
-    echo 
+    echo
     echo "Backup of Database Server - ${CONFIG_mysql_dump_host_friendly:-$CONFIG_mysql_dump_host}"
     ( IFS=,; echo "Databases - ${CONFIG_db_names[*]}" )
     ( IFS=,; echo "Databases (monthly) - ${CONFIG_db_month_names[*]}" )
